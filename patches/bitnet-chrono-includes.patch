@@ -1,0 +1,47 @@
+diff --git a/common/common.cpp b/common/common.cpp
+index 451307b5..b7fabadf 100644
+--- a/common/common.cpp
++++ b/common/common.cpp
+@@ -11,6 +11,7 @@
+ #include "llama.h"
+ 
+ #include <algorithm>
++#include <chrono>
+ #include <cinttypes>
+ #include <climits>
+ #include <cmath>
+diff --git a/common/log.cpp b/common/log.cpp
+index 04c7c0ed..aea209fc 100644
+--- a/common/log.cpp
++++ b/common/log.cpp
+@@ -1,5 +1,6 @@
+ #include "log.h"
+ 
++#include <chrono>
+ #include <condition_variable>
+ #include <cstdarg>
+ #include <cstdio>
+diff --git a/examples/imatrix/imatrix.cpp b/examples/imatrix/imatrix.cpp
+index d1ff3e8b..bb4f8d9a 100644
+--- a/examples/imatrix/imatrix.cpp
++++ b/examples/imatrix/imatrix.cpp
+@@ -3,6 +3,7 @@
+ #include "log.h"
+ #include "llama.h"
+ 
++#include <chrono>
+ #include <cmath>
+ #include <cstdio>
+ #include <cstring>
+diff --git a/examples/perplexity/perplexity.cpp b/examples/perplexity/perplexity.cpp
+index efb41b80..2f821e0c 100644
+--- a/examples/perplexity/perplexity.cpp
++++ b/examples/perplexity/perplexity.cpp
+@@ -6,6 +6,7 @@
+ #include <algorithm>
+ #include <array>
+ #include <atomic>
++#include <chrono>
+ #include <cmath>
+ #include <cstdio>
+ #include <cstring>

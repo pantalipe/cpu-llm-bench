@@ -1,0 +1,104 @@
+INFO:hf-to-gguf:Loading model: Falcon3-3B-Instruct-1.58bit
+INFO:gguf.gguf_writer:gguf: This GGUF file is for Little Endian only
+INFO:hf-to-gguf:Set model parameters
+INFO:hf-to-gguf:gguf: context length = 4096
+INFO:hf-to-gguf:gguf: embedding length = 3072
+INFO:hf-to-gguf:gguf: feed forward length = 9216
+INFO:hf-to-gguf:gguf: head count = 12
+INFO:hf-to-gguf:gguf: key-value head count = 4
+INFO:hf-to-gguf:gguf: rope theta = 1000042
+INFO:hf-to-gguf:gguf: rms norm epsilon = 1e-06
+INFO:hf-to-gguf:gguf: file type = 0
+INFO:hf-to-gguf:Set model tokenizer
+INFO:gguf.vocab:Adding 128810 merge(s).
+INFO:gguf.vocab:Setting special token type eos to 11
+INFO:gguf.vocab:Setting special token type pad to 2023
+INFO:gguf.vocab:Setting special token type bos to 11
+INFO:gguf.vocab:Setting chat_template to {%- if tools %}
+{{- '<|system|>\n' }}
+{%- if messages[0]['role'] == 'system' %}
+{{- messages[0]['content'] }}
+{%- set remaining_messages = messages[1:] %}
+{%- else %}
+{%- set remaining_messages = messages %}
+{%- endif %}
+{{- 'You are a Falcon assistant skilled in function calling. You are helpful, respectful, and concise.\n\n# Tools\n\nYou have access to the following functions. You MUST use them to answer questions when needed. For each function call, you MUST return a JSON object inside <tool_call></tool_call> tags.\n\n<tools>' + tools|tojson(indent=2) + '</tools>\n\n# Output Format\n\nYour response MUST follow this format when making function calls:\n<tool_call>\n[\n  {"name": "function_name", "arguments": {"arg1": "value1", "arg2": "value2"}},\n  {"name": "another_function", "arguments": {"arg": "value"}}\n]\n</tool_call>\nIf no function calls are needed, respond normally without the tool_call tags.\n' }}
+{%- for message in remaining_messages %}
+{%- if message['role'] == 'user' %}
+{{- '<|user|>\n' + message['content'] + '\n' }}
+{%- elif message['role'] == 'assistant' %}
+{%- if message.content %}
+{{- '<|assistant|>\n' + message['content'] }}
+{%- endif %}
+{%- if message.tool_calls %}
+{{- '\n<tool_call>\n' }}
+{{- message.tool_calls|tojson(indent=2) }}
+{{- '\n</tool_call>' }}
+{%- endif %}
+{{- eos_token + '\n' }}
+{%- elif message['role'] == 'tool' %}
+{{- '<|assistant|>\n<tool_response>\n' + message['content'] + '\n</tool_response>\n' }}
+{%- endif %}
+{%- endfor %}
+{{- '<|assistant|>\n' if add_generation_prompt }}
+{%- else %}
+{%- for message in messages %}
+{%- if message['role'] == 'system' %}
+{{- '<|system|>\n' + message['content'] + '\n' }}
+{%- elif message['role'] == 'user' %}
+{{- '<|user|>\n' + message['content'] + '\n' }}
+{%- elif message['role'] == 'assistant' %}
+{%- if not loop.last %}
+{{- '<|assistant|>\n' + message['content'] + eos_token + '\n' }}
+{%- else %}
+{{- '<|assistant|>\n' + message['content'] + eos_token }}
+{%- endif %}
+{%- endif %}
+{%- if loop.last and add_generation_prompt %}
+{{- '<|assistant|>\n' }}
+{%- endif %}
+{%- endfor %}
+{%- endif %}
+INFO:hf-to-gguf:Exporting model to 'models\Falcon3-3B-Instruct-1.58bit\ggml-model-f32.gguf'
+INFO:hf-to-gguf:gguf: loading model part 'model.safetensors'
+INFO:hf-to-gguf:gguf: loading model part 'model.safetensors'
+INFO:hf-to-gguf:output.weight,               torch.bfloat16 --> F32, shape = {3072, 131072}
+INFO:hf-to-gguf:token_embd.weight,           torch.bfloat16 --> F32, shape = {3072, 131072}
+INFO:hf-to-gguf:blk.0.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.0.ffn_down.weight,       torch.uint8 --> F32, shape = {9216, 3072}
+INFO:hf-to-gguf:blk.0.ffn_gate.weight,       torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.0.ffn_up.weight,         torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.0.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.0.attn_k.weight,         torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.0.attn_output.weight,    torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.0.attn_q.weight,         torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.0.attn_v.weight,         torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.1.attn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.1.ffn_down.weight,       torch.uint8 --> F32, shape = {9216, 3072}
+INFO:hf-to-gguf:blk.1.ffn_gate.weight,       torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.1.ffn_up.weight,         torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.1.ffn_norm.weight,       torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.1.attn_k.weight,         torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.1.attn_output.weight,    torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.1.attn_q.weight,         torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.1.attn_v.weight,         torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.10.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.10.ffn_down.weight,      torch.uint8 --> F32, shape = {9216, 3072}
+INFO:hf-to-gguf:blk.10.ffn_gate.weight,      torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.10.ffn_up.weight,        torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.10.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.10.attn_k.weight,        torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.10.attn_output.weight,   torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.10.attn_q.weight,        torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.10.attn_v.weight,        torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.11.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.11.ffn_down.weight,      torch.uint8 --> F32, shape = {9216, 3072}
+INFO:hf-to-gguf:blk.11.ffn_gate.weight,      torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.11.ffn_up.weight,        torch.uint8 --> F32, shape = {3072, 9216}
+INFO:hf-to-gguf:blk.11.ffn_norm.weight,      torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.11.attn_k.weight,        torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.11.attn_output.weight,   torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.11.attn_q.weight,        torch.uint8 --> F32, shape = {3072, 3072}
+INFO:hf-to-gguf:blk.11.attn_v.weight,        torch.uint8 --> F32, shape = {3072, 1024}
+INFO:hf-to-gguf:blk.12.attn_norm.weight,     torch.bfloat16 --> F32, shape = {3072}
+INFO:hf-to-gguf:blk.12.ffn_down.weight,      torch.uint8 --> F32, shape = {9216, 3072}

@@ -1,0 +1,12 @@
+diff --git a/ggml/src/iqk/iqk_common.h b/ggml/src/iqk/iqk_common.h
+index f4ef0c8c..ec9b8e36 100644
+--- a/ggml/src/iqk/iqk_common.h
++++ b/ggml/src/iqk/iqk_common.h
+@@ -940,6 +940,7 @@ inline void static_for(T&&f) {
+ 
+ #if defined(_MSC_VER)
+ #pragma warning(disable: 4244 4267) // possible loss of data
++#include <cstdint>
+ #include <intrin.h>
+ #include <ammintrin.h>
+ #include <nmmintrin.h>

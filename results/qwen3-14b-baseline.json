@@ -1,0 +1,80 @@
+{
+  "timestamp": "2026-07-09T01:35:37.355573",
+  "llm_server": "9 model(s): deepseek-coder:6.7b-instruct-q4_K_M, llama3.1:8b, mistral:7b, phi3",
+  "llm_base_url": "http://localhost:8081",
+  "system": {
+    "os": "Windows",
+    "os_ver": "10.0.19045",
+    "cpu": "Intel64 Family 6 Model 58 Stepping 9, GenuineIntel",
+    "python": "3.14.3",
+    "ram_total_mb": 16348.9,
+    "vram_total_mb": null
+  },
+  "models": [
+    "qwen3:14b"
+  ],
+  "prompt_file": "bench_prompts.json",
+  "results": [
+    {
+      "model": "qwen3:14b",
+      "prompt_id": "commit_msg_simple",
+      "category": "text",
+      "description": "Commit message from a small Python diff",
+      "runs": [
+        {
+          "run": 1,
+          "tokens_generated": 14,
+          "tokens_per_second": 1.27,
+          "time_to_first_token_s": null,
+          "total_duration_s": 11.0267,
+          "ram_used_mb_before": 14501.0,
+          "ram_used_mb_after": 14517.0,
+          "ram_delta_mb": 16.0,
+          "vram_used_mb_before": null,
+          "vram_used_mb_after": null,
+          "vram_delta_mb": null,
+          "output_preview": "feat(server): add logging for server start message"
+        },
+        {
+          "run": 2,
+          "tokens_generated": 14,
+          "tokens_per_second": 1.17,
+          "time_to_first_token_s": null,
+          "total_duration_s": 12.0105,
+          "ram_used_mb_before": 14517.0,
+          "ram_used_mb_after": 14511.7,
+          "ram_delta_mb": -5.3,
+          "vram_used_mb_before": null,
+          "vram_used_mb_after": null,
+          "vram_delta_mb": null,
+          "output_preview": "feat(server): add logging for server start message"
+        },
+        {
+          "run": 3,
+          "tokens_generated": 14,
+          "tokens_per_second": 1.16,
+          "time_to_first_token_s": null,
+          "total_duration_s": 12.056,
+          "ram_used_mb_before": 14511.7,
+          "ram_used_mb_after": 14513.8,
+          "ram_delta_mb": 2.1,
+          "vram_used_mb_before": null,
+          "vram_used_mb_after": null,
+          "vram_delta_mb": null,
+          "output_preview": "feat(server): add logging for server start message"
+        }
+      ],
+      "summary": {
+        "avg_tokens_per_second": 1.2,
+        "avg_time_to_first_token_s": null,
+        "avg_total_duration_s": 11.6977,
+        "avg_tokens_generated": 14.0,
+        "consistency_score": 1.0,
+        "peak_ram_delta_mb": 16.0,
+        "peak_vram_delta_mb": null,
+        "successful_runs": 3,
+        "total_runs": 3
+      }
+    }
+  ]
+}

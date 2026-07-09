@@ -1,0 +1,24 @@
+microsoft/BitNet-b1.58-2B-4T, I2_S quantization, official pre-converted GGUF
+Hardware: Intel Xeon E3-1230 v2 (4C/8T, AVX1-only), 16GB RAM, Windows 10
+Build: 1f86f058 (llama.cpp fork bundled with microsoft/BitNet), Clang 19.1.5, ClangCL toolset
+
+Command: llama-bench -m ggml-model-i2_s.gguf -p 512 -n 128 -t 4
+
+| model                                 | size     | params | backend | threads | test  | t/s          |
+| ------------------------------------- | -------: | -----: | ------- | ------: | ----- | -----------: |
+| bitnet-b1.58 2B I2_S - 2 bpw ternary   | 1.71 GiB | 2.74 B | CPU     | 4       | pp512 | 6.28 ± 0.19  |
+| bitnet-b1.58 2B I2_S - 2 bpw ternary   | 1.71 GiB | 2.74 B | CPU     | 4       | tg128 | 6.46 ± 0.27  |
+
+Command: llama-bench -m ggml-model-i2_s.gguf -p 512 -n 128 -t 8
+
+| model                                 | size     | params | backend | threads | test  | t/s          |
+| ------------------------------------- | -------: | -----: | ------- | ------: | ----- | -----------: |
+| bitnet-b1.58 2B I2_S - 2 bpw ternary   | 1.71 GiB | 2.74 B | CPU     | 8       | pp512 | 5.55 ± 0.79  |
+| bitnet-b1.58 2B I2_S - 2 bpw ternary   | 1.71 GiB | 2.74 B | CPU     | 8       | tg128 | 6.73 ± 0.40  |
+
+Note: using only the 4 physical cores (-t 4) matched or beat using all 8 logical
+threads (-t 8) on this CPU for this model size — hyperthreading did not help pp512
+and only marginally helped tg128.
+
+Baseline comparison — qwen3:14b (Q3_K_XL) via Ollama/llama-swap, same machine:
+1.2 tok/s average (see qwen3-14b-baseline.json for full ollama-bench output)
