@@ -1,0 +1,19 @@
+Qwen3-14B, IQ3_XXS quantization (bartowski/Qwen_Qwen3-14B-GGUF), llama.cpp mainline (ggml-org, commit 049326a)
+Hardware: Intel Xeon E3-1230 v2 (4C/8T, AVX1-only), 16GB RAM, Windows 10
+Build: clean, no patches required, Clang 19.1.5 / ClangCL toolset
+
+Command: llama-bench -m Qwen_Qwen3-14B-IQ3_XXS.gguf -p 512 -n 128 -t 4
+
+| model                          | size     | params | backend | threads | test  | t/s          |
+| ------------------------------- | -------: | -----: | ------- | ------: | ----- | -----------: |
+| qwen3 14B IQ3_XXS - 3.0625 bpw   | 5.53 GiB | 14.77 B | CPU     | 4       | pp512 | 1.22 ± 0.05 |
+| qwen3 14B IQ3_XXS - 3.0625 bpw   | 5.53 GiB | 14.77 B | CPU     | 4       | tg128 | 1.12 ± 0.00 |
+
+Baseline for comparison — same underlying model (Qwen3-14B), Q3_K_XL quant, via Ollama/llama-swap:
+1.2 tok/s average (see qwen3-14b-baseline.json)
+
+Conclusion: no meaningful speed difference between IQ3_XXS and Q3_K_XL on this CPU. I-quant kernels
+in llama.cpp are optimized for AVX2 dot-product instructions; without AVX2 the extra dequant overhead
+of the I-quant format isn't offset by any SIMD win, so throughput lands at parity with (or slightly
+below) a conventional K-quant at a similar bit-depth. The IQ format's real benefit here is a smaller
+file size, not speed.

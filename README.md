@@ -29,6 +29,7 @@ similar-era hardware.
 | BitNet-b1.58-2B-4T — actual text generation | ❌ broken (see bugs below) |
 | Falcon3-3B-Instruct-1.58bit (official BitNet, HF→GGUF conversion) | ❌ crash mid-conversion |
 | ik_llama.cpp build (AVX1-only x86 target) | ❌ build fails, two distinct bugs found |
+| Qwen3-14B IQ3_XXS vs Q3_K_XL (same model, llama.cpp mainline) | **no speed gain** (1.12-1.22 vs 1.2 tok/s) — I-quants need AVX2 to pay off |
 
 **Conclusion so far:** the raw speed claim for CPU-only ternary/low-bit inference checks out — on hardware
 with zero SIMD advantages beyond AVX1, BitNet.cpp still delivered ~5x the throughput of a conventional
@@ -165,6 +166,32 @@ results/    — raw benchmark JSON / logs
 - If you're on similar hardware and want CPU speedup *today*, the pragmatic move is probably staying on
   mainline llama.cpp/Ollama with a smaller conventional model (e.g. a 3-4B Q4_K_M) rather than chasing
   bleeding-edge low-bit CPU kernels — until these forks get more non-AVX2 testing coverage.
+
+## 3. Mainline llama.cpp + IQ quants (a common "just do this instead" suggestion)
+
+A frequent recommendation once BitNet/exotic runtimes hit trouble: skip them and just use llama.cpp's
+own low-bit "I-quants" (`IQ2_XS`, `IQ3_XXS`, etc.) on a conventional model. Worth testing directly, since
+it needs zero patches — mainline `ggml-org/llama.cpp` built clean on this CPU with no changes required
+(a good sign in itself, compared to the two forks above).
+
+Tested `Qwen3-14B` — the exact same model already used as the baseline, just re-quantized — at `IQ3_XXS`
+(bartowski/Qwen_Qwen3-14B-GGUF), against the existing `Q3_K_XL` baseline:
+
+| Config | pp512 | tg128 |
+|---|---|---|
+| Qwen3-14B, Q3_K_XL (baseline, Ollama) | — | 1.2 tok/s |
+| Qwen3-14B, IQ3_XXS (llama.cpp mainline, same hardware) | 1.22 tok/s | 1.12 tok/s |
+
+**No speed gain at all** — essentially identical, if anything marginally worse for generation. This isn't
+a bug, it's expected: I-quant kernels rely on SIMD tricks that need AVX2 to pay off. Without AVX2, you pay
+the extra dequantization/compute cost of the fancier format without getting the offsetting speedup. This
+matches bartowski's own disclaimer on quant model cards ("I-quants can also be used on CPU, but will be
+slower than their K-quant equivalent").
+
+**Takeaway:** on a pre-AVX2 CPU, switching quant *format* at the same parameter count buys you smaller
+files, not speed. If BitNet doesn't work cleanly (see above) and IQ-quants don't help either, the only
+remaining lever for raw throughput is reducing parameter count (a smaller model), which is orthogonal to
+quantization scheme entirely.
 
 ## Contributing
 
