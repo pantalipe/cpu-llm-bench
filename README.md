@@ -30,6 +30,7 @@ similar-era hardware.
 | Falcon3-3B-Instruct-1.58bit (official BitNet, HF→GGUF conversion) | ❌ crash mid-conversion |
 | ik_llama.cpp build (AVX1-only x86 target) | ❌ build fails, two distinct bugs found |
 | Qwen3-14B IQ3_XXS vs Q3_K_XL (same model, llama.cpp mainline) | **no speed gain** (1.12-1.22 vs 1.2 tok/s) — I-quants need AVX2 to pay off |
+| Qwen3-14B IQ3_XXS via llamafile 0.10.0 (same GGUF, same hardware) | **~5x slower** than mainline llama.cpp (~0.21 vs 1.12 tok/s) |
 
 **Conclusion so far:** the raw speed claim for CPU-only ternary/low-bit inference checks out — on hardware
 with zero SIMD advantages beyond AVX1, BitNet.cpp still delivered ~5x the throughput of a conventional
