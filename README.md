@@ -27,7 +27,7 @@ similar-era hardware.
 | Current baseline (`qwen3:14b`, Ollama, CPU) | 1.2 tok/s |
 | BitNet-b1.58-2B-4T (official microsoft/BitNet, I2_S, 4 threads) | **6.3-6.5 tok/s** (~5x) — speed confirmed |
 | BitNet-b1.58-2B-4T — actual text generation | ❌ broken (see bugs below) |
-| Falcon3-3B-Instruct-1.58bit (official BitNet, HF→GGUF conversion) | ❌ crash mid-conversion |
+| Falcon3-3B-Instruct-1.58bit (official BitNet, HF→GGUF conversion) | ❌ crash mid-conversion (fixed as of Mar 2026 retest — see below) |
 | ik_llama.cpp build (AVX1-only x86 target) | ❌ build fails, two distinct bugs found |
 | Qwen3-14B IQ3_XXS vs Q3_K_XL (same model, llama.cpp mainline) | **no speed gain** (1.12-1.22 vs 1.2 tok/s) — I-quants need AVX2 to pay off |
 | Qwen3-14B IQ3_XXS via llamafile 0.10.0 (same GGUF, same hardware) | **~5x slower** than mainline llama.cpp (~0.21 vs 1.12 tok/s) |
@@ -37,6 +37,25 @@ with zero SIMD advantages beyond AVX1, BitNet.cpp still delivered ~5x the throug
 Q3_K_XL 14B model on llama.cpp/Ollama. But neither of the two projects tested produces a *working, complete*
 pipeline out of the box on this hardware today — both hit real, reproducible bugs before a clean end-to-end
 generation was possible. Details and patches below.
+
+## Update — March 2026 retest (post Jan-2026 BitNet CPU optimization)
+
+Microsoft shipped a "BitNet CPU Inference Optimization" update on 01/15/2026. Retested on the same
+hardware with `bitnet-test` rebuilt from `main` @ `01eb415` (2026-03-10). Full details in
+`results/bitnet-2b-retest-mar2026.md` and `results/falcon3-3b-retest-mar2026.md`.
+
+| Test | Result |
+|---|---|
+| BitNet-2B generation quality bug | still broken — same pre-tokenizer warning, same `!!!!!!!!` output |
+| BitNet-2B eval speed | 6.44 tok/s — throughput gain still holds |
+| `llama-bench.exe` | new regression — crashes instantly (stack overflow, 0xC00000FD), zero output |
+| Falcon3-3B HF→GGUF conversion | fixed — completes cleanly, no more block-12 crash |
+| Falcon3-3B I2_S quantization | works — 201/201 tensors, 2.06 GiB final size |
+| Falcon3-3B generation | new failure mode — no visible output text at all (possibly BOS/EOS/PAD/EOG all mapping to token 11) |
+
+**Bottom line:** 2 months of upstream fixes moved the needle on Falcon3-3B (conversion + quantization
+now work) but generation still isn't usable for either model, via two different failure modes. Net new
+finding: a `llama-bench` regression that wasn't present in the original test.
 
 ## Methodology
 
