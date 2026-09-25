@@ -57,6 +57,22 @@ hardware with `bitnet-test` rebuilt from `main` @ `01eb415` (2026-03-10). Full d
 now work) but generation still isn't usable for either model, via two different failure modes. Net new
 finding: a `llama-bench` regression that wasn't present in the original test.
 
+## Update — July 2026 retest: ik_llama.cpp
+
+Repo had moved to `c2b58f8` (2026-07-09) — `iqk_quantize.cpp` had grown substantially since
+the original test. Full details in `results/ik-llama-retest-jul2026.md`.
+
+| Test | Result |
+|---|---|
+| `iqk_common.h` cstdint fix | still needed, patch still applies cleanly |
+| Original `GGML_FP16_TO_FP32` bug | gone — but replaced by two new build errors in the same file |
+| New bug A | AVX2 intrinsics (`__m256i`, `hsum_i32_8`) compiled outside an AVX2 guard |
+| New bug B | non-AVX2/non-ARM fallback path is a literal `// TODO` stub referencing an undeclared variable |
+
+**Bottom line:** still doesn't build on this hardware, but the specific failure moved — this
+kernel file is under active rework and its non-AVX2 x86 coverage is incomplete to the point of
+having unfinished (`// TODO`) code in the fallback path.
+
 ## Methodology
 
 - Speed: `llama-bench` (or the project's own benchmark harness), pp512/tg128, default settings unless noted.
